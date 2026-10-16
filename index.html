@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="theme-color" content="#2b6cb0">
+<title>Sổ báo giảng - Trịnh Ngọc Ánh</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: #f0f4f8;
+    color: #1a202c;
+    line-height: 1.5;
+    padding-bottom: 40px;
+    font-size: 16px;
+    overflow-x: hidden;
+  }
+
+  /* ===== BANNER ===== */
+  .header {
+    background: linear-gradient(135deg, #2b6cb0, #4299e1);
+    color: white;
+    padding: 12px 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+  }
+  .header h1 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .header .today {
+    font-size: 0.78rem;
+    opacity: 0.95;
+    background: rgba(255,255,255,0.15);
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .info-line {
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.4;
+  }
+  .info-line b { font-weight: 700; }
+  .info-icon {
+    font-size: 0.95rem;
+    flex-shrink: 0;
+  }
+
+  .container { max-width: 1250px; margin: 0 auto; padding: 12px; }
+
+  /* ===== TABS MÔN ===== */
+  .tabs {
+    display: flex; gap: 6px; margin-bottom: 12px;
+    overflow-x: auto; padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex-shrink: 0;
+    padding: 9px 14px;
+    background: white;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.15s;
+    display: flex; align-items: center; gap: 6px;
+    white-space: nowrap;
+  }
+  .tab:active { transform: scale(0.97); }
+  .tab.active { border-color: currentColor; box-shadow: 0 3px 10px rgba(0,0,0,0.12); }
+  .tab .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .tab .count { font-size: 0.7rem; color: #718096; font-weight: 500; }
+
+  /* ===== CARD ===== */
+  .card {
+    background: white;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .card h2 {
+    font-size: 0.98rem;
+    color: #2c5282;
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  .card h2 .title { display: flex; align-items: center; gap: 6px; }
+  .card h2 .actions { display: flex; gap: 5px; flex-wrap: wrap; }
+
+  /* ===== BUTTONS ===== */
+  button {
+    padding: 9px 14px;
+    border: none; border-radius: 8px;
+    background: #3182ce; color: white;
+    cursor: pointer; font-weight: 600;
+    font-size: 0.88rem; font-family: inherit;
+    transition: all 0.15s;
+    min-height: 40px;
+    touch-action: manipulation;
+  }
+  button:active { transform: scale(0.96); background: #2b6cb0; }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  button.ghost { background: #e2e8f0; color: #2d3748; }
+  button.ghost:active { background: #cbd5e0; }
+  button.danger { background: #e53e3e; }
+  button.danger:active { background: #c53030; }
+  button.success { background: #38a169; }
+  button.small { padding: 6px 10px; font-size: 0.82rem; min-height: 34px; }
+
+  /* ===== STATS ===== */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  @media (min-width: 700px) {
+    .stats { grid-template-columns: repeat(4, 1fr); }
+  }
+  .stat {
+    padding: 12px;
+    border-radius: 10px;
+    color: white;
+    background: linear-gradient(135deg, #4299e1, #3182ce);
+  }
+  .stat.green { background: linear-gradient(135deg, #48bb78, #38a169); }
+  .stat.orange { background: linear-gradient(135deg, #ed8936, #dd6b20); }
+  .stat.purple { background: linear-gradient(135deg, #9f7aea, #805ad5); }
+  .stat.gray { background: linear-gradient(135deg, #a0aec0, #718096); }
+  .stat-label { font-size: 0.72rem; opacity: 0.95; }
+  .stat-value { font-size: 1.15rem; font-weight: 700; margin-top: 2px; }
+  .stat-sub { font-size: 0.7rem; opacity: 0.9; margin-top: 2px; line-height: 1.3; }
+  .progress-bar {
+    height: 5px; background: rgba(255,255,255,0.35);
+    border-radius: 3px; overflow: hidden; margin-top: 5px;
+  }
+  .progress-bar > div { height: 100%; background: white; transition: width 0.4s; }
+
+  /* ===== LESSON CARD ===== */
+  .lesson-card {
+    display: flex; gap: 8px;
+    padding: 10px;
+    border-radius: 10px;
+    background: #f7fafc;
+    border-left: 4px solid #4299e1;
+    margin-bottom: 6px;
+    align-items: flex-start;
+  }
+  .lesson-card.dc { border-color: #805ad5; background: #faf5ff; }
+  .lesson-card.hd { border-color: #3182ce; background: #ebf8ff; }
+  .lesson-card.kt { border-color: #e53e3e; background: #fff5f5; }
+  .lesson-card .icon { font-size: 1rem; line-height: 1.3; flex-shrink: 0; }
+  .lesson-card .info { flex: 1; min-width: 0; }
+  .lesson-card .title {
+    font-weight: 600; margin-bottom: 2px;
+    font-size: 0.9rem; word-break: break-word;
+    line-height: 1.4;
+  }
+  .lesson-card .detail { font-size: 0.78rem; color: #4a5568; }
+  .lesson-card .ma {
+    display: inline-block; padding: 2px 8px;
+    border-radius: 12px; font-size: 0.72rem;
+    font-weight: 700; margin-right: 5px;
+    white-space: nowrap;
+  }
+  .lesson-card .ma.dc { background: #e9d8fd; color: #553c9a; }
+  .lesson-card .ma.hd { background: #bee3f8; color: #2c5282; }
+  .lesson-card .ma.kt { background: #fed7d7; color: #c53030; }
+  .lesson-card .ma.khac { background: #e2e8f0; color: #4a5568; }
+
+  .type-group-title {
+    font-size: 0.82rem; font-weight: 700;
+    margin: 10px 0 6px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .type-group-title.dc { color: #553c9a; }
+  .type-group-title.hd { color: #2c5282; }
+  .type-group-title.kt { color: #c53030; }
+
+  /* ===== TABLE ===== */
+  .table-wrap {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 65vh;
+    border-radius: 10px;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid #e2e8f0;
+  }
+  table {
+    width: 100%; border-collapse: collapse;
+    min-width: 400px;
+  }
+  table.week-table { min-width: 360px; }
+  th, td {
+    padding: 8px 8px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+    font-size: 0.82rem;
+    vertical-align: middle;
+  }
+  th {
+    background: #edf2f7; font-weight: 700; color: #2d3748;
+    font-size: 0.72rem; text-transform: uppercase;
+    letter-spacing: 0.03em; position: sticky; top: 0;
+    z-index: 1;
+  }
+  tr.current-week { background: #fefcbf; }
+  tr.current-week td:first-child b { color: #975a16; font-size: 0.95rem; }
+  tr.current-week td:first-child .hint { color: #975a16; }
+  tr.past-week { opacity: 0.55; }
+  tr.edited { background: #fffaf0; }
+  tr.edited.current-week { background: #fde68a; }
+  tr.edited td:first-child::after { content: " ✏️"; font-size: 0.7rem; }
+  tr.hd-row td:nth-child(2) { color: #2c5282; font-weight: 700; }
+  tr.dc-row td:nth-child(2) { color: #553c9a; font-weight: 700; }
+
+  .empty {
+    text-align: center; color: #a0aec0;
+    font-style: italic; padding: 18px;
+    font-size: 0.88rem;
+  }
+
+  /* ===== CLASS TABS ===== */
+  .class-tabs {
+    display: flex; gap: 6px; margin-bottom: 12px;
+    flex-wrap: wrap; align-items: center;
+  }
+  .class-tab {
+    padding: 7px 13px;
+    background: #edf2f7; color: #2d3748;
+    border-radius: 20px; cursor: pointer;
+    font-weight: 600; font-size: 0.85rem;
+    transition: all 0.15s;
+    touch-action: manipulation;
+    min-height: 36px;
+    display: inline-flex; align-items: center;
+  }
+  .class-tab:active { transform: scale(0.95); }
+  .class-tab.active { background: #3182ce; color: white; }
+
+  .hint { font-size: 0.75rem; color: #718096; line-height: 1.4; }
+  .hint.warn { color: #c05621; }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed; bottom: 20px; left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #2d3748; color: white;
+    padding: 12px 18px; border-radius: 10px;
+    font-weight: 600; opacity: 0;
+    transition: all 0.3s; z-index: 999;
+    pointer-events: none; font-size: 0.88rem;
+    max-width: calc(100vw - 40px);
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .toast.success { background: #38a169; }
+  .toast.error { background: #e53e3e; }
+
+  /* ===== INPUT ===== */
+  input {
+    padding: 6px 4px;
+    border-radius: 6px;
+    border: 1.5px solid #cbd5e0;
+    font-size: 0.85rem;
+    font-family: inherit;
+    text-align: center;
+    min-height: 32px;
+  }
+  input:focus {
+    outline: none; border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66,153,225,0.15);
+  }
+  input.num { width: 42px; }
+
+  .week-input {
+    display: inline-flex; gap: 3px; align-items: center;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+  .week-input label {
+    font-size: 0.68rem; color: #718096; font-weight: 600;
+    flex-shrink: 0;
+  }
+  .week-input .sep { color: #cbd5e0; margin: 0 2px; }
+
+  @media (max-width: 500px) {
+    .week-input label { font-size: 0.65rem; }
+    input.num { width: 38px; font-size: 0.8rem; padding: 5px 3px; min-height: 30px; }
+  }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    align-items: center; justify-content: center;
+    padding: 12px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white; border-radius: 14px;
+    padding: 20px;
+    max-width: 480px; width: 100%;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    max-height: 90vh; overflow-y: auto;
+  }
+  .modal h3 {
+    color: #2c5282; margin-bottom: 14px;
+    font-size: 1.05rem;
+  }
+  .modal .field {
+    margin-bottom: 12px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .modal label { font-size: 0.82rem; font-weight: 600; color: #4a5568; }
+  .modal input { width: 100%; text-align: left; padding: 10px; }
+  .modal .actions {
+    display: flex; gap: 8px; justify-content: flex-end;
+    margin-top: 16px; flex-wrap: wrap;
+  }
+  .modal .actions button { flex: 1; min-width: 90px; }
+  .modal .note {
+    font-size: 0.8rem; color: #718096;
+    background: #f7fafc; padding: 10px; border-radius: 8px;
+    margin-bottom: 14px;
+  }
+
+  /* ===== TAB TỔNG HỢP ===== */
+  .week-nav {
+    display: flex; gap: 6px; align-items: center;
+    justify-content: center; margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .week-nav button {
+    padding: 8px 12px; font-size: 0.85rem;
+  }
+  .week-nav .current {
+    padding: 8px 16px;
+    background: #3182ce; color: white;
+    border-radius: 10px;
+    font-weight: 700; font-size: 0.95rem;
+    text-align: center;
+    min-width: 180px;
+  }
+  .subject-block {
+    background: white;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border-left: 5px solid #ccc;
+  }
+  .subject-block h3 {
+    font-size: 1rem;
+    margin-bottom: 4px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .subject-block .sub-title {
+    font-size: 0.78rem; color: #718096;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed #e2e8f0;
+  }
+
+  @media (max-width: 400px) {
+    .header { padding: 10px 12px; }
+    .header h1 { font-size: 0.95rem; }
+    .header .today { font-size: 0.7rem; padding: 3px 8px; }
+    .info-line { font-size: 0.78rem; }
+    .info-icon { font-size: 0.85rem; }
+    .container { padding: 8px; }
+    .card { padding: 12px; }
+    .stat-value { font-size: 1.05rem; }
+    th, td { padding: 7px 6px; font-size: 0.78rem; }
+    .tab { padding: 8px 12px; font-size: 0.85rem; }
+    button { font-size: 0.82rem; padding: 8px 12px; }
+  }
+
+  @media (max-width: 640px) {
+    .table-wrap { max-height: none; overflow-y: visible; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <h1>📖 Sổ báo giảng</h1>
+    <div class="today" id="todayLabel"></div>
+  </div>
+  <div class="header-info">
+    <div class="info-line">
+      <span class="info-icon">🏫</span>
+      <span>Trường THPT Tân Yên số 2 - Bắc Ninh</span>
+    </div>
+    <div class="info-line">
+      <span class="info-icon">👨‍🏫</span>
+      <span>GV: <b>Trịnh Ngọc Ánh</b></span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="tabs" id="subjectTabs"></div>
+  <div id="mainContent"></div>
+</div>
+
+<div class="modal-overlay" id="modalConfig">
+  <div class="modal">
+    <h3>⚙️ Cấu hình môn học</h3>
+    <div class="note">Thay đổi áp dụng cho môn đang chọn.</div>
+    <div class="field">
+      <label>Ngày bắt đầu tuần 1</label>
+      <input type="date" id="cfgStartDate">
+    </div>
+    <div class="field">
+      <label>Tổng số tuần năm học</label>
+      <input type="number" id="cfgTotalWeeks" min="1" max="52">
+    </div>
+    <div id="cfgTypeFields"></div>
+    <div class="actions">
+      <button class="ghost" onclick="closeModal()">Hủy</button>
+      <button class="danger" onclick="resetAllConfig()">↺ Reset</button>
+      <button class="success" onclick="saveConfig()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================
+   HẰNG SỐ
+===================================================== */
+const STORAGE_KEY = 'sobaogiang_v10';
+
+/* =====================================================
+   PPCT TIN 11
+===================================================== */
+const PPCT_TIN = [
+  { ma: "1",  ten: "Bài 1. Hệ điều hành (tiết 1)" },
+  { ma: "2",  ten: "Bài 1. Hệ điều hành (tiết 2)" },
+  { ma: "3",  ten: "Bài 2. Thực hành sử dụng hệ điều hành (tiết 1)" },
+  { ma: "4",  ten: "Bài 2. Thực hành sử dụng hệ điều hành (tiết 2)" },
+  { ma: "5",  ten: "Bài 3. Phần mềm nguồn mở và phần mềm chạy trên Internet (tiết 1)" },
+  { ma: "6",  ten: "Bài 3. Phần mềm nguồn mở và phần mềm chạy trên Internet (tiết 2)" },
+  { ma: "7",  ten: "Bài 4. Bên trong máy tính (tiết 1)" },
+  { ma: "8",  ten: "Bài 4. Bên trong máy tính (tiết 2)" },
+  { ma: "9",  ten: "Bài 5. Kết nối máy tính với các thiết bị số" },
+  { ma: "10", ten: "Ôn tập chủ đề A" },
+  { ma: "11", ten: "Bài 6. Lưu trữ và chia sẻ tệp tin trên Internet (tiết 1)" },
+  { ma: "12", ten: "Bài 6. Lưu trữ và chia sẻ tệp tin trên Internet (tiết 2)" },
+  { ma: "13", ten: "Bài 7. Thực hành tìm kiếm thông tin trên Internet (tiết 1)" },
+  { ma: "14", ten: "Bài 7. Thực hành tìm kiếm thông tin trên Internet (tiết 2)" },
+  { ma: "15", ten: "Bài 8. Thực hành nâng cao sử dụng thư điện tử và mạng xã hội (tiết 1)" },
+  { ma: "16", ten: "Bài 8. Thực hành nâng cao sử dụng thư điện tử và mạng xã hội (tiết 2)" },
+  { ma: "17", ten: "Bài 9. Giao tiếp an toàn trên Internet (tiết 1)" },
+  { ma: "18", ten: "Bài 9. Giao tiếp an toàn trên Internet (tiết 2)" },
+  { ma: "19", ten: "Bài 9. Giao tiếp an toàn trên Internet (tiết 3)" },
+  { ma: "20", ten: "Bài 25. Phần mềm chỉnh sửa ảnh (tiết 1)" },
+  { ma: "21", ten: "Bài 25. Phần mềm chỉnh sửa ảnh (tiết 2)" },
+  { ma: "22", ten: "Bài 26. Công cụ chọn và công cụ tinh chỉnh màu sắc (tiết 1)" },
+  { ma: "23", ten: "Bài 26. Công cụ chọn và công cụ tinh chỉnh màu sắc (tiết 2)" },
+  { ma: "24", ten: "Bài 27. Công cụ vẽ và một số ứng dụng (tiết 1)" },
+  { ma: "25", ten: "Bài 27. Công cụ vẽ và một số ứng dụng (tiết 2)" },
+  { ma: "26", ten: "Bài 28. Tạo ảnh động (tiết 1)" },
+  { ma: "27", ten: "Bài 28. Tạo ảnh động (tiết 2)" },
+  { ma: "28", ten: "Bài 29. Khám phá phần mềm làm phim (tiết 1)" },
+  { ma: "29", ten: "Bài 29. Khám phá phần mềm làm phim (tiết 2)" },
+  { ma: "30", ten: "Bài 30. Biên tập phim (tiết 1)" },
+  { ma: "31", ten: "Bài 30. Biên tập phim (tiết 2)" },
+  { ma: "32", ten: "Bài 31. Thực hành tạo phim hoạt hình" },
+  { ma: "33", ten: "Ôn tập chủ đề E" },
+  { ma: "34", ten: "Bài 16. Nghề quản trị cơ sở dữ liệu (tiết 1)" },
+  { ma: "35", ten: "Bài 16. Nghề quản trị cơ sở dữ liệu (tiết 2)" },
+  { ma: "36", ten: "Bài 10. Lưu trữ dữ liệu và khai thác thông tin phục vụ quản lí" },
+  { ma: "37", ten: "Bài 11. Cơ sở dữ liệu (tiết 1)" },
+  { ma: "38", ten: "Bài 11. Cơ sở dữ liệu (tiết 2)" },
+  { ma: "39", ten: "Bài 12. Hệ quản trị cơ sở dữ liệu và hệ cơ sở dữ liệu (tiết 1)" },
+  { ma: "40", ten: "Bài 12. Hệ quản trị cơ sở dữ liệu và hệ cơ sở dữ liệu (tiết 2)" },
+  { ma: "41", ten: "Bài 13. Cơ sở dữ liệu quan hệ (tiết 1)" },
+  { ma: "42", ten: "Bài 13. Cơ sở dữ liệu quan hệ (tiết 2)" },
+  { ma: "43", ten: "Bài 14. SQL – Ngôn ngữ truy vấn có cấu trúc (tiết 1)" },
+  { ma: "44", ten: "Bài 14. SQL – Ngôn ngữ truy vấn có cấu trúc (tiết 2)" },
+  { ma: "45", ten: "Bài 15. Bảo mật và an toàn hệ cơ sở dữ liệu" },
+  { ma: "46", ten: "Ôn tập chủ đề F" },
+  { ma: "47", ten: "Bài 17. Quản trị CSDL trên máy tính (tiết 1)" },
+  { ma: "48", ten: "Bài 17. Quản trị CSDL trên máy tính (tiết 2)" },
+  { ma: "49", ten: "Bài 18. Xác định cấu trúc bảng và các trường khóa (tiết 1)" },
+  { ma: "50", ten: "Bài 18. Xác định cấu trúc bảng và các trường khóa (tiết 2)" },
+  { ma: "51", ten: "Bài 19. Thực hành tạo lập CSDL và các bảng đơn giản (tiết 1)" },
+  { ma: "52", ten: "Bài 19. Thực hành tạo lập CSDL và các bảng đơn giản (tiết 2)" },
+  { ma: "53", ten: "Bài 20. Thực hành tạo lập các bảng có khóa ngoài (tiết 1)" },
+  { ma: "54", ten: "Bài 20. Thực hành tạo lập các bảng có khóa ngoài (tiết 2)" },
+  { ma: "55", ten: "Bài 20. Thực hành tạo lập các bảng có khóa ngoài (tiết 3)" },
+  { ma: "56", ten: "Bài 21. Thực hành cập nhật và truy xuất dữ liệu các bảng đơn giản (tiết 1)" },
+  { ma: "57", ten: "Bài 21. Thực hành cập nhật và truy xuất dữ liệu các bảng đơn giản (tiết 2)" },
+  { ma: "58", ten: "Bài 21. Thực hành cập nhật và truy xuất dữ liệu các bảng đơn giản (tiết 3)" },
+  { ma: "59", ten: "Bài 22. Thực hành cập nhật bảng dữ liệu có tham chiếu (tiết 1)" },
+  { ma: "60", ten: "Bài 22. Thực hành cập nhật bảng dữ liệu có tham chiếu (tiết 2)" },
+  { ma: "61", ten: "Bài 23. Thực hành truy xuất dữ liệu qua liên kết các bảng (tiết 1)" },
+  { ma: "62", ten: "Bài 23. Thực hành truy xuất dữ liệu qua liên kết các bảng (tiết 2)" },
+  { ma: "63", ten: "Bài 24. Thực hành: Sao lưu dữ liệu" },
+  { ma: "64", ten: "Ôn tập chủ đề F" }
+];
+
+/* =====================================================
+   PPCT GDĐP 11
+===================================================== */
+const PPCT_GDDP = [
+  { ma: "V1",  ten: "Bài 10: Khái quát văn học viết Bắc Ninh (tiết 1)" },
+  { ma: "V2",  ten: "Bài 10: Khái quát văn học viết Bắc Ninh (tiết 2)" },
+  { ma: "V3",  ten: "Bài 11: Phú trung đại Bắc Ninh (tiết 3)" },
+  { ma: "V4",  ten: "Bài 11: Phú trung đại Bắc Ninh (tiết 4)" },
+  { ma: "V5",  ten: "Bài 11: Phú trung đại Bắc Ninh (tiết 5)" },
+  { ma: "V6",  ten: "Bài 11: Phú trung đại Bắc Ninh (tiết 6)" },
+  { ma: "V7",  ten: "Bài 12: Thơ hiện đại Bắc Ninh (tiết 7)" },
+  { ma: "V8",  ten: "Bài 12: Thơ hiện đại Bắc Ninh (tiết 8)" },
+  { ma: "V9",  ten: "Bài 12: Thơ hiện đại Bắc Ninh (tiết 9)" },
+  { ma: "V10", ten: "Bài 12: Thơ hiện đại Bắc Ninh (tiết 10)" },
+  { ma: "Đ1",  ten: "Bài 1: Khái quát chung kinh tế TP Bắc Ninh (tiết 1)" },
+  { ma: "Đ2",  ten: "Bài 1: Khái quát chung kinh tế TP Bắc Ninh (tiết 2)" },
+  { ma: "Đ3",  ten: "Bài 3: Ngành công nghiệp TP Bắc Ninh (tiết 1)" },
+  { ma: "Đ4",  ten: "Bài 3: Ngành công nghiệp TP Bắc Ninh (tiết 2)" },
+  { ma: "Đ5",  ten: "Bài 2: Ngành nông, lâm nghiệp và thuỷ sản ở Bắc Ninh (tiết 1)" },
+  { ma: "Đ6",  ten: "Bài 2: Ngành nông, lâm nghiệp và thuỷ sản ở Bắc Ninh (tiết 2)" },
+  { ma: "Đ7",  ten: "Bài 4: Các ngành dịch vụ TP Bắc Ninh (tiết 1)" },
+  { ma: "Đ8",  ten: "Bài 4: Các ngành dịch vụ TP Bắc Ninh (tiết 2)" },
+  { ma: "Đ9",  ten: "Bài 5: Thực hành: Giới thiệu về nông sản quê hương em" },
+  { ma: "Đ10", ten: "Bài 6: Trải nghiệm ngành, nghề TP Bắc Ninh (tiết 1)" },
+  { ma: "Đ11", ten: "Bài 6: Trải nghiệm ngành, nghề TP Bắc Ninh (tiết 2)" },
+  { ma: "Đ12", ten: "Bài 6: Trải nghiệm ngành, nghề TP Bắc Ninh (tiết 3)" },
+  { ma: "Đ13", ten: "Bài 6: Trải nghiệm ngành, nghề TP Bắc Ninh (tiết 4)" },
+  { ma: "S1",  ten: "Bài 7: Khái quát về danh nhân Bắc Ninh (tiết 1)" },
+  { ma: "S2",  ten: "Bài 7: Khái quát về danh nhân Bắc Ninh (tiết 2)" },
+  { ma: "S3",  ten: "Bài 8: Một số danh nhân tiêu biểu ở Bắc Ninh (tiết 1)" },
+  { ma: "S4",  ten: "Bài 8: Một số danh nhân tiêu biểu ở Bắc Ninh (tiết 2)" },
+  { ma: "S5",  ten: "Bài 8: Một số danh nhân tiêu biểu ở Bắc Ninh (tiết 3)" },
+  { ma: "S6",  ten: "Bài 8: Một số danh nhân tiêu biểu ở Bắc Ninh (tiết 4)" },
+  { ma: "S7",  ten: "Bài 9: Thực hành Giới thiệu về danh nhân Bắc Ninh (tiết 1)" },
+  { ma: "S8",  ten: "Bài 9: Thực hành Giới thiệu về danh nhân Bắc Ninh (tiết 2)" }
+];
+
+/* =====================================================
+   PPCT HĐTN 11
+===================================================== */
+const PPCT_HDTN = [
+  { ma: "DC1",  ten: "Khai giảng năm học mới, tìm hiểu truyền thống nhà trường" },
+  { ma: "HĐ1",  ten: "Tìm hiểu nội dung, phương pháp và hình thức trải nghiệm của chủ đề" },
+  { ma: "DC2",  ten: "Tọa đàm Sử dụng mạng xã hội tích cực" },
+  { ma: "HĐ2",  ten: "Thực hành trải nghiệm: HĐ1, HĐ2" },
+  { ma: "HĐ3",  ten: "Thực hành trải nghiệm: HĐ3, HĐ4" },
+  { ma: "HĐ4",  ten: "Thực hành trải nghiệm: HĐ5" },
+  { ma: "HĐ5",  ten: "Thực hành trải nghiệm: HĐ6" },
+  { ma: "HĐ6",  ten: "Thực hành trải nghiệm: HĐ7" },
+  { ma: "HĐ7",  ten: "Thảo luận, báo cáo và phản hồi kết quả vận dụng. Đánh giá cuối chủ đề 1" },
+  { ma: "DC3",  ten: "Truyền thông về chủ đề Tôn trọng sự khác biệt" },
+  { ma: "HĐ8",  ten: "Tìm hiểu nội dung, phương pháp và hình thức trải nghiệm của chủ đề" },
+  { ma: "DC4",  ten: "Tham gia toạ đàm về Con đường phát triển bản thân (T1)" },
+  { ma: "DC5",  ten: "Tham gia toạ đàm về Con đường phát triển bản thân (T2)" },
+  { ma: "HĐ9",  ten: "Thực hành trải nghiệm: HĐ1" },
+  { ma: "HĐ10", ten: "Thực hành trải nghiệm: HĐ2" },
+  { ma: "HĐ11", ten: "Thực hành trải nghiệm: HĐ3" },
+  { ma: "HĐ12", ten: "Thực hành trải nghiệm: HĐ4" },
+  { ma: "HĐ13", ten: "Thực hành trải nghiệm: HĐ5, HĐ6" },
+  { ma: "HĐ14", ten: "Thực hành trải nghiệm: HĐ7, HĐ8" },
+  { ma: "HĐ15", ten: "Chia sẻ kết quả rèn luyện, thay đổi bản thân" },
+  { ma: "HĐ16", ten: "Thảo luận, báo cáo và phản hồi kết quả vận dụng. Đánh giá cuối chủ đề 2" },
+  { ma: "DC6",  ten: "Tổ chức hoạt động với chủ đề Nhà ngoại giao tương lai" },
+  { ma: "HĐ17", ten: "Tìm hiểu nội dung, phương pháp và hình thức trải nghiệm của chủ đề" },
+  { ma: "DC7",  ten: "Toạ đàm 'Lối sống tiết kiệm và an toàn' (T1)" },
+  { ma: "DC8",  ten: "Toạ đàm 'Lối sống tiết kiệm và an toàn' (T2)" },
+  { ma: "HĐ18", ten: "Thực hành trải nghiệm: HĐ1" },
+  { ma: "HĐ19", ten: "Thực hành trải nghiệm: HĐ2" },
+  { ma: "HĐ20", ten: "Thực hành trải nghiệm: HĐ3, HĐ4" },
+  { ma: "HĐ21", ten: "Thực hành trải nghiệm: HĐ5, HĐ6" },
+  { ma: "HĐ22", ten: "Thực hành trải nghiệm: HĐ7, HĐ8" },
+  { ma: "HĐ23", ten: "Thực hành trải nghiệm: HĐ9" },
+  { ma: "HĐ24", ten: "Thực hành trải nghiệm: HĐ10" },
+  { ma: "HĐ25", ten: "Thực hành trải nghiệm: HĐ11" },
+  { ma: "HĐ26", ten: "Học tập lối sống kỉ luật của quân đội" },
+  { ma: "HĐ27", ten: "Chia sẻ kết quả rèn luyện, hoàn thiện bản thân (T1)" },
+  { ma: "HĐ28", ten: "Chia sẻ kết quả rèn luyện, hoàn thiện bản thân (T2)" },
+  { ma: "HĐ29", ten: "Thảo luận, báo cáo và phản hồi kết quả vận dụng. Đánh giá cuối chủ đề 3" },
+  { ma: "DC9",  ten: "Tọa đàm Học sinh và trách nhiệm với công việc gia đình" },
+  { ma: "HĐ30", ten: "Tìm hiểu nội dung, phương pháp và hình thức trải nghiệm của chủ đề" },
+  { ma: "HĐ31", ten: "Thực hành trải nghiệm: HĐ1 – HĐ2" },
+  { ma: "HĐ32", ten: "Thực hành trải nghiệm: HĐ3 – HĐ4" },
+  { ma: "HĐ33", ten: "Thực hành trải nghiệm: HĐ5 – HĐ6" },
+  { ma: "HĐ34", ten: "Thực hành trải nghiệm: HĐ7 – HĐ8" },
+  { ma: "HĐ35", ten: "Thực hành trải nghiệm: HĐ9" },
+  { ma: "HĐ36", ten: "Giữ gìn nếp nhà" },
+  { ma: "HĐ37", ten: "Thảo luận, báo cáo và phản hồi kết quả vận dụng. Đánh giá cuối chủ đề 4" },
+  { ma: "DC10", ten: "Ngày hội 'Hoạt động thiện nguyện vì cộng đồng'" },
+  { ma: "HĐ38", ten: "Tìm hiểu nội dung, phương pháp và hình thức trải nghiệm của chủ đề" },
+  { ma: "DC11", ten: "Ứng xử văn minh khi tham gia lễ hội (T1)" },
+  { ma: "DC12", ten: "Ứng xử văn minh khi tham gia lễ hội (T2)" },
+  { ma: "HĐ39", ten: "Thực hành trải nghiệm: HĐ1 – HĐ7 (T1)" },
+  { ma: "HĐ40", ten: "Thực hành trải nghiệm: HĐ2 (T2)" },
+  { ma: "HĐ41", ten: "Thực hành trải nghiệm: HĐ3 (T3)" },
+  { ma: "HĐ42", ten: "Thực hành trải nghiệm: HĐ4 (T4)" },
+  { ma: "HĐ43", ten: "Thực hành trải nghiệm: HĐ5 (T5)" },
+  { ma: "HĐ44", ten: "Thảo luận, báo cáo và phản hồi kết quả vận dụng. Đánh giá cuối chủ đề 5" },
+  { ma: "DC13", ten: "Giới thiệu các sản phẩm thể hiện vẻ đẹp danh lam thắng cảnh, cảnh quan thiên nhiên" },
+  { ma: "HĐ45", ten: "Tìm hiểu nội dung, phương pháp và hình thức trải nghiệm của chủ đề" },
+  { ma: "HĐ46", ten: "Thực hành trải nghiệm: HĐ1, HĐ2, HĐ3" },
+  { ma: "HĐ47", ten: "Thực hành trải nghiệm: HĐ4, HĐ5" },
+  { ma: "HĐ48", ten: "Thực hành trải nghiệm: HĐ6, HĐ7" },
+  { ma: "HĐ49", ten: "Thảo luận, báo cáo và phản hồi kết quả vận dụng. Đánh giá cuối chủ đề 6" },
+  { ma: "DC14", ten: "Toạ đàm 'Vì môi trường bền vững'" },
+  { ma: "HĐ50", ten: "Tìm hiểu nội dung, phương pháp và hình thức trải nghiệm của chủ đề" },
+  { ma: "HĐ51", ten: "Thực hành trải nghiệm: HĐ1, HĐ2" },
+  { ma: "HĐ52", ten: "Thực hành trải nghiệm: HĐ3, HĐ4" },
+  { ma: "HĐ53", ten: "Thực hành trải nghiệm: HĐ5" },
+  { ma: "HĐ54", ten: "Thực hành trải nghiệm: HĐ6" },
+  { ma: "HĐ55", ten: "Thực hiện tiết kiệm điện, nước vì môi trường bền vững (T1)" },
+  { ma: "HĐ56", ten: "Thực hiện tiết kiệm điện, nước vì môi trường bền vững (T2)" },
+  { ma: "HĐ57", ten: "Thảo luận, báo cáo và phản hồi kết quả vận dụng. Đánh giá cuối chủ đề 7" },
+  { ma: "DC15", ten: "Ngày hội hướng nghiệp" },
+  { ma: "HĐ58", ten: "Tìm hiểu nội dung, phương pháp và hình thức trải nghiệm của chủ đề" },
+  { ma: "HĐ59", ten: "Trưng bày các sản phẩm sáng tạo về những nghề nghiệp em quan tâm (T1)" },
+  { ma: "HĐ60", ten: "Trưng bày các sản phẩm sáng tạo về những nghề nghiệp em quan tâm (T2)" },
+  { ma: "HĐ61", ten: "Thực hành trải nghiệm: HĐ1, HĐ2" },
+  { ma: "HĐ62", ten: "Thực hành trải nghiệm: HĐ3, HĐ4" },
+  { ma: "HĐ63", ten: "Thực hành trải nghiệm: HĐ5" },
+  { ma: "HĐ64", ten: "Thực hành trải nghiệm: HĐ6" },
+  { ma: "HĐ65", ten: "Chia sẻ về ước mơ nghề nghiệp của em" },
+  { ma: "HĐ66", ten: "Thảo luận, báo cáo và phản hồi kết quả vận dụng. Đánh giá cuối chủ đề 8" },
+  { ma: "DC16", ten: "Trao đổi về sự phát triển của các nghề phổ biến trong xã hội hiện đại" },
+  { ma: "HĐ67", ten: "Tìm hiểu nội dung, phương pháp và hình thức trải nghiệm của chủ đề" },
+  { ma: "HĐ68", ten: "Thực hành trải nghiệm: HĐ1, HĐ2" },
+  { ma: "HĐ69", ten: "Thực hành trải nghiệm: HĐ3" },
+  { ma: "HĐ70", ten: "Thực hành trải nghiệm: HĐ4" },
+  { ma: "HĐ71", ten: "Thực hành trải nghiệm: HĐ5" },
+  { ma: "HĐ72", ten: "Thiết kế và triển lãm Cây nghề nghiệp về nghề em quan tâm (T1)" },
+  { ma: "HĐ73", ten: "Thiết kế và triển lãm Cây nghề nghiệp về nghề em quan tâm (T2)" },
+  { ma: "HĐ74", ten: "Thảo luận, báo cáo và phản hồi kết quả vận dụng. Đánh giá cuối chủ đề 9" },
+  { ma: "DC17", ten: "Diễn đàn thanh niên Nghề em quan tâm và các phẩm chất, năng lực cần thiết" },
+  { ma: "HĐ75", ten: "Tìm hiểu nội dung, phương pháp và hình thức trải nghiệm của chủ đề" },
+  { ma: "HĐ76", ten: "Thực hành trải nghiệm: HĐ1, HĐ2" },
+  { ma: "HĐ77", ten: "Thực hành trải nghiệm: HĐ3, HĐ4" },
+  { ma: "HĐ78", ten: "Thực hành trải nghiệm: HĐ5" },
+  { ma: "HĐ79", ten: "Thực hành trải nghiệm: HĐ6" },
+  { ma: "HĐ80", ten: "Thảo luận, báo cáo và phản hồi kết quả vận dụng. Đánh giá cuối chủ đề 10" }
+];
+/* =====================================================
+   DỮ LIỆU MẶC ĐỊNH
+===================================================== */
+const DEFAULT_DATA = {
+  subjects: [
+    {
+      id: "hdtn-11",
+      name: "HĐTN 11",
+      color: "#3182ce",
+      hasTypes: true,
+      config: {
+        startDate: "2026-08-31",
+        totalWeeks: 35,
+        defaultHD: 3,
+        defaultDC: 0
+      },
+      weekOverrides: {
+        1: { HD: 0, DC: 2, KT: 0 },
+        2: { HD: 3, DC: 0, KT: 0 },
+        3: { HD: 0, DC: 3, KT: 0 },
+        4: { HD: 3, DC: 0, KT: 0 },
+        5: { HD: 3, DC: 0, KT: 0 },
+        6: { HD: 3, DC: 2, KT: 0 },
+        7: { HD: 3, DC: 1, KT: 0 }
+      },
+      ppct: [...PPCT_HDTN],
+      classes: [{ id: "11a5", name: "11A5" }]
+    },
+    {
+      id: "gddp-11",
+      name: "GDĐP 11",
+      color: "#38a169",
+      hasTypes: false,
+      config: {
+        startDate: "2026-08-31",
+        totalWeeks: 35,
+        defaultPeriods: 1
+      },
+      weekOverrides: {
+        1: { P: 0, KT: 0 }
+      },
+      ppct: [...PPCT_GDDP],
+      classes: [{ id: "11a5", name: "11A5" }]
+    },
+    {
+      id: "tin-11",
+      name: "Tin 11",
+      color: "#dd6b20",
+      hasTypes: false,
+      config: {
+        startDate: "2026-08-31",
+        totalWeeks: 35,
+        defaultPeriods: 2
+      },
+      weekOverrides: {},
+      ppct: [...PPCT_TIN],
+      classes: [
+        { id: "11a3", name: "11A3" },
+        { id: "11a4", name: "11A4" },
+        { id: "11a5", name: "11A5" },
+        { id: "11a7", name: "11A7" }
+      ]
+    }
+  ]
+};
+
+/* =====================================================
+   STATE
+===================================================== */
+let app = JSON.parse(JSON.stringify(DEFAULT_DATA));
+let activeSubjectId = 'TONGHOP';
+let activeClassId = null;
+let tongHopTuan = null;
+
+/* =====================================================
+   LƯU / ĐỌC
+===================================================== */
+function loadData() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.subjects && parsed.subjects.length) {
+        parsed.subjects.forEach(ps => {
+          const def = DEFAULT_DATA.subjects.find(d => d.id === ps.id);
+          if (def) {
+            ps.ppct = def.ppct;
+            ps.name = def.name;
+            ps.color = def.color;
+            ps.hasTypes = def.hasTypes;
+            if (!ps.classes || !ps.classes.length) ps.classes = def.classes;
+            if (!ps.config) ps.config = def.config;
+            if (!ps.weekOverrides) ps.weekOverrides = def.weekOverrides;
+          }
+        });
+        app = parsed;
+      }
+    } catch (e) { console.warn("Lỗi load", e); }
+  }
+  if (!activeSubjectId) activeSubjectId = 'TONGHOP';
+  const sub = getActiveSubject();
+  if (sub && (!activeClassId || !sub.classes.find(c => c.id === activeClassId))) {
+    activeClassId = sub.classes[0]?.id || null;
+  }
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(app));
+}
+
+function getActiveSubject() {
+  if (activeSubjectId === 'TONGHOP') return null;
+  return app.subjects.find(s => s.id === activeSubjectId) || app.subjects[0];
+}
+
+function getActiveClass() {
+  const sub = getActiveSubject();
+  if (!sub) return null;
+  return sub.classes.find(c => c.id === activeClassId) || sub.classes[0];
+}
+
+/* =====================================================
+   LOGIC
+===================================================== */
+function getLoaiHinh(ma) {
+  const s = String(ma || "").trim().toUpperCase();
+  if (s.startsWith("DC")) return "DC";
+  if (s.startsWith("HĐ") || s.startsWith("HD")) return "HD";
+  if (s.startsWith("KT")) return "KT";
+  return null;
+}
+
+function getSoTietTuan(sub, t) {
+  if (sub.weekOverrides[t]) {
+    const ov = sub.weekOverrides[t];
+    return {
+      HD: ov.HD !== undefined ? ov.HD : (sub.hasTypes ? sub.config.defaultHD : 0),
+      DC: ov.DC !== undefined ? ov.DC : (sub.hasTypes ? sub.config.defaultDC : 0),
+      P: ov.P !== undefined ? ov.P : (sub.hasTypes ? 0 : sub.config.defaultPeriods),
+      KT: ov.KT !== undefined ? ov.KT : 0
+    };
+  }
+  if (sub.hasTypes) {
+    return { HD: sub.config.defaultHD || 3, DC: sub.config.defaultDC || 0, P: 0, KT: 0 };
+  }
+  return { HD: 0, DC: 0, P: sub.config.defaultPeriods || 1, KT: 0 };
+}
+
+function isTuanMacDinh(sub, t) {
+  return sub.weekOverrides[t] === undefined;
+}
+
+function chiaTuan(sub) {
+  const queueHD = [];
+  const queueDC = [];
+  const queueAll = [];
+
+  sub.ppct.forEach((tiet, idx) => {
+    const loai = getLoaiHinh(tiet.ma);
+    const item = { ...tiet, _idx: idx };
+    if (loai === "HD") queueHD.push(item);
+    else if (loai === "DC") queueDC.push(item);
+    else queueAll.push(item);
+  });
+
+  const ketQua = {};
+  let hdIdx = 0, dcIdx = 0, allIdx = 0;
+
+  for (let t = 1; t <= sub.config.totalWeeks; t++) {
+    const soTiet = getSoTietTuan(sub, t);
+    const tuanItems = [];
+
+    if (sub.hasTypes) {
+      for (let i = 0; i < (soTiet.HD || 0); i++) {
+        if (hdIdx < queueHD.length) {
+          tuanItems.push({ ...queueHD[hdIdx++], loai: "HD" });
+        }
+      }
+      for (let i = 0; i < (soTiet.DC || 0); i++) {
+        if (dcIdx < queueDC.length) {
+          tuanItems.push({ ...queueDC[dcIdx++], loai: "DC" });
+        }
+      }
+    } else {
+      for (let i = 0; i < (soTiet.P || 0); i++) {
+        if (allIdx < queueAll.length) {
+          tuanItems.push({ ...queueAll[allIdx++], loai: null });
+        }
+      }
+    }
+
+    ketQua[t] = tuanItems;
+  }
+
+  const conLai = {
+    HD: queueHD.length - hdIdx,
+    DC: queueDC.length - dcIdx,
+    P: queueAll.length - allIdx
+  };
+
+  return { ketQua, conLai };
+}
+
+function getTuanHienTai(config) {
+  if (!config.startDate) return 0;
+  const start = new Date(config.startDate);
+  const today = new Date();
+  start.setHours(0,0,0,0);
+  today.setHours(0,0,0,0);
+  const diff = Math.floor((today - start) / (1000*60*60*24));
+  if (diff < 0) return 0;
+  return Math.floor(diff / 7) + 1;
+}
+
+function getNgayTuan(config, tuan) {
+  const start = new Date(config.startDate);
+  const from = new Date(start);
+  from.setDate(start.getDate() + (tuan - 1) * 7);
+  const to = new Date(from);
+  to.setDate(from.getDate() + 6);
+  return { from, to };
+}
+
+function formatNgay(d) {
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  return `${dd}/${mm}`;
+}
+
+function formatDate(d) {
+  const days = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  return `${days[d.getDay()]}, ${dd}/${mm}/${d.getFullYear()}`;
+}
+
+/* =====================================================
+   RENDER
+===================================================== */
+function render() {
+  document.getElementById('todayLabel').textContent = formatDate(new Date());
+  renderTabs();
+  renderMain();
+}
+
+function renderTabs() {
+  const tabs = document.getElementById('subjectTabs');
+  tabs.innerHTML = '';
+
+  const t0 = document.createElement('div');
+  t0.className = 'tab' + (activeSubjectId === 'TONGHOP' ? ' active' : '');
+  t0.style.color = '#805ad5';
+  if (activeSubjectId === 'TONGHOP') t0.style.background = '#805ad515';
+  t0.innerHTML = `
+    <span class="dot" style="background:#805ad5"></span>
+    <span style="color:#1a202c">📊 Tổng hợp</span>
+  `;
+  t0.onclick = () => {
+    activeSubjectId = 'TONGHOP';
+    activeClassId = null;
+    render();
+  };
+  tabs.appendChild(t0);
+
+  app.subjects.forEach(sub => {
+    const t = document.createElement('div');
+    t.className = 'tab' + (sub.id === activeSubjectId ? ' active' : '');
+    t.style.color = sub.color;
+    if (sub.id === activeSubjectId) t.style.background = sub.color + '15';
+    t.innerHTML = `
+      <span class="dot" style="background:${sub.color}"></span>
+      <span style="color:#1a202c">${escapeHtml(sub.name)}</span>
+      <span class="count">(${sub.classes.length} lớp)</span>
+    `;
+    t.onclick = () => {
+      activeSubjectId = sub.id;
+      activeClassId = sub.classes[0]?.id || null;
+      render();
+    };
+    tabs.appendChild(t);
+  });
+}
+
+function renderMain() {
+  const main = document.getElementById('mainContent');
+
+  if (activeSubjectId === 'TONGHOP') {
+    main.innerHTML = renderTongHop();
+    return;
+  }
+
+  const sub = getActiveSubject();
+  if (!sub) { main.innerHTML = '<div class="empty">Chưa có môn nào</div>'; return; }
+  main.innerHTML = renderSubject(sub);
+  attachEvents(sub);
+}
+
+/* ===== TAB TỔNG HỢP ===== */
+function renderTongHop() {
+  const sub0 = app.subjects[0];
+  const tuanHT = getTuanHienTai(sub0.config);
+  const tuan = tongHopTuan !== null ? tongHopTuan : (tuanHT > 0 ? tuanHT : 1);
+
+  const { from, to } = getNgayTuan(sub0.config, tuan);
+  const isCurrent = tuan === tuanHT;
+
+  let html = `
+    <div class="week-nav">
+      <button class="ghost" onclick="chuyenTuan(-1)" ${tuan <= 1 ? 'disabled' : ''}>← Tuần ${tuan - 1}</button>
+      <div class="current">Tuần ${tuan}<br><span style="font-size:0.78rem;font-weight:400">${formatNgay(from)} → ${formatNgay(to)}</span></div>
+      <button class="ghost" onclick="chuyenTuan(1)" ${tuan >= sub0.config.totalWeeks ? 'disabled' : ''}>Tuần ${tuan + 1} →</button>
+    </div>
+    ${!isCurrent && tuanHT > 0 ? `<div style="text-align:center;margin-bottom:12px"><button class="ghost small" onclick="veTuanHienTai()">↩ Về tuần hiện tại (Tuần ${tuanHT})</button></div>` : ''}
+  `;
+
+  app.subjects.forEach(sub => {
+    const { ketQua } = chiaTuan(sub);
+    const items = ketQua[tuan] || [];
+    const soTiet = getSoTietTuan(sub, tuan);
+
+    html += `
+      <div class="subject-block" style="border-left-color:${sub.color}">
+        <h3>
+          <span style="width:10px;height:10px;border-radius:50%;background:${sub.color};display:inline-block"></span>
+          ${escapeHtml(sub.name)}
+        </h3>
+    `;
+
+    if (sub.hasTypes) {
+      const lop = sub.classes[0];
+      html += `<div class="sub-title">Lớp: ${escapeHtml(lop?.name || '—')}</div>`;
+      html += renderTongHopNoiDung(items, soTiet, true);
+    } else {
+      sub.classes.forEach(lop => {
+        html += `<div class="sub-title">Lớp: <b>${escapeHtml(lop.name)}</b></div>`;
+        html += renderTongHopNoiDung(items, soTiet, false);
+      });
+    }
+
+    html += `</div>`;
+  });
+
+  return html;
+}
+
+function renderTongHopNoiDung(items, soTiet, hasTypes) {
+  let html = '';
+  const coKT = soTiet.KT > 0;
+
+  if (!hasTypes) {
+    if (items.length) {
+      html += items.map(t => `
+        <div class="lesson-card">
+          <div class="icon">📘</div>
+          <div class="info">
+            <div class="title">${escapeHtml(t.ma)}: ${escapeHtml(t.ten)}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+  } else {
+    const hd = items.filter(t => t.loai === "HD");
+    const dc = items.filter(t => t.loai === "DC");
+    if (hd.length) {
+      html += `<div class="type-group-title hd">🔵 Hoạt động (HĐ) — ${hd.length} tiết</div>`;
+      html += hd.map(t => `
+        <div class="lesson-card hd">
+          <div class="icon">🔵</div>
+          <div class="info">
+            <div class="title"><span class="ma hd">${escapeHtml(t.ma)}</span>: ${escapeHtml(t.ten)}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+    if (dc.length) {
+      html += `<div class="type-group-title dc">🟣 Sinh hoạt dưới cờ (DC) — ${dc.length} tiết</div>`;
+      html += dc.map(t => `
+        <div class="lesson-card dc">
+          <div class="icon">🟣</div>
+          <div class="info">
+            <div class="title"><span class="ma dc">${escapeHtml(t.ma)}</span>: ${escapeHtml(t.ten)}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+
+  if (coKT) {
+    html += `<div class="type-group-title kt">🎯 Kiểm tra định kì — ${soTiet.KT} tiết</div>`;
+    for (let i = 0; i < soTiet.KT; i++) {
+      html += `
+        <div class="lesson-card kt">
+          <div class="icon">🎯</div>
+          <div class="info">
+            <div class="title"><span class="ma kt">KT</span>: Kiểm tra định kì</div>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  if (!html) {
+    html = '<div class="empty">— Không có tiết nào trong tuần này —</div>';
+  }
+  return html;
+}
+
+function chuyenTuan(delta) {
+  const sub0 = app.subjects[0];
+  const tuanHT = getTuanHienTai(sub0.config);
+  const tuanHienTai = tongHopTuan !== null ? tongHopTuan : (tuanHT > 0 ? tuanHT : 1);
+  const tuanMoi = tuanHienTai + delta;
+  if (tuanMoi < 1 || tuanMoi > sub0.config.totalWeeks) return;
+  tongHopTuan = tuanMoi;
+  render();
+}
+
+function veTuanHienTai() {
+  tongHopTuan = null;
+  render();
+}
+
+/* ===== TAB MÔN ===== */
+function renderSubject(sub) {
+  const lop = getActiveClass();
+  if (!lop) return '<div class="empty">Môn này chưa có lớp</div>';
+
+  const tuanHT = getTuanHienTai(sub.config);
+  const { ketQua, conLai } = chiaTuan(sub);
+
+  const tongHD = sub.ppct.filter(t => getLoaiHinh(t.ma) === "HD").length;
+  const tongDC = sub.ppct.filter(t => getLoaiHinh(t.ma) === "DC").length;
+  const tongPPCT = sub.ppct.length;
+
+  let daDay = 0;
+  for (let t = 1; t < tuanHT; t++) {
+    if (ketQua[t]) daDay += ketQua[t].length;
+  }
+
+  const phanTram = tongPPCT ? Math.round(daDay / tongPPCT * 100) : 0;
+  const conLaiTong = conLai.HD + conLai.DC + conLai.P;
+
+  return `
+    <div class="class-tabs">
+      ${sub.classes.map(c => `
+        <div class="class-tab ${c.id === lop.id ? 'active' : ''}" data-class-id="${c.id}">${escapeHtml(c.name)}</div>
+      `).join('')}
+      <button class="ghost small" onclick="themLop()" style="border-radius:20px">+ Lớp</button>
+      <button class="ghost small" onclick="suaTenLop()" style="border-radius:20px">✏️ Sửa tên</button>
+      ${sub.classes.length > 1
+        ? `<button class="danger small" onclick="xoaLop()" style="border-radius:20px">🗑️ Xóa lớp</button>`
+        : ''}
+    </div>
+
+    <div class="stats">
+      <div class="stat ${tuanHT > 0 ? '' : 'gray'}">
+        <div class="stat-label">Tuần hiện tại</div>
+        <div class="stat-value">${tuanHT > 0 ? 'Tuần ' + tuanHT : 'Chưa bắt đầu'}</div>
+        <div class="stat-sub">Bắt đầu: ${formatNgay(new Date(sub.config.startDate))}</div>
+      </div>
+      <div class="stat purple">
+        <div class="stat-label">Tổng PPCT</div>
+        <div class="stat-value">${tongPPCT} tiết</div>
+        <div class="stat-sub">${sub.hasTypes ? `DC: ${tongDC} · HĐ: ${tongHD}` : 'Không chia loại'}</div>
+      </div>
+      <div class="stat green">
+        <div class="stat-label">Đã dạy</div>
+        <div class="stat-value">${daDay} tiết</div>
+        <div class="progress-bar"><div style="width:${phanTram}%"></div></div>
+      </div>
+      <div class="stat orange">
+        <div class="stat-label">Còn lại</div>
+        <div class="stat-value">${Math.max(0, tongPPCT - daDay)} tiết</div>
+        ${conLaiTong > 0 ? `<div class="stat-sub">Chưa xếp tuần: ${conLaiTong}</div>` : ''}
+      </div>
+    </div>
+
+    ${renderTuanCard(sub, ketQua, tuanHT)}
+    ${renderTuanCard(sub, ketQua, tuanHT + 1)}
+
+    <div class="card">
+      <h2>
+        <span class="title">📅 Tiến độ theo tuần</span>
+        <span class="actions">
+          ${Object.keys(sub.weekOverrides).length > 0
+            ? `<button class="ghost small" onclick="resetAllWeekOverrides()">↺ Bỏ ghi đè</button>`
+            : ''}
+          <button class="ghost small" onclick="moCauHinh()">⚙️ Cấu hình</button>
+        </span>
+      </h2>
+      <div class="hint" style="margin-bottom:10px">
+        💡 Sửa số tiết trực tiếp. Các tuần sau tự dồn.
+        ${Object.keys(sub.weekOverrides).length > 0
+          ? `<span class="hint warn">· ${Object.keys(sub.weekOverrides).length} tuần ghi đè ✏️</span>`
+          : ''}
+      </div>
+      <div class="table-wrap">
+        <table class="week-table">
+          <thead>
+            <tr>
+              <th style="width:110px">Tuần</th>
+              <th style="width:${sub.hasTypes ? '160px' : '120px'}">Số tiết</th>
+              <th>Nội dung</th>
+            </tr>
+          </thead>
+          <tbody id="weekBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>
+        <span class="title">📚 PPCT <span class="hint" style="font-weight:400;font-size:0.72rem">(${sub.ppct.length} tiết)</span></span>
+      </h2>
+      <div class="table-wrap" style="max-height:400px">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:50px">STT</th>
+              <th style="width:80px">Mã</th>
+              <th>Bài học</th>
+              <th style="width:60px">Tuần</th>
+            </tr>
+          </thead>
+          <tbody id="ppctBody"></tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function renderTuanCard(sub, ketQua, tuan) {
+  if (tuan > sub.config.totalWeeks) {
+    return `
+      <div class="card">
+        <h2><span class="title">📅 Tuần ${tuan}</span></h2>
+        <div class="empty">🎉 Đã hết năm học</div>
+      </div>
+    `;
+  }
+
+  const { from, to } = getNgayTuan(sub.config, tuan);
+  const items = ketQua[tuan] || [];
+  const soTiet = getSoTietTuan(sub, tuan);
+  const tuanHT = getTuanHienTai(sub.config);
+  const isCurrent = tuan === tuanHT;
+
+  let label = `📅 Tuần ${tuan} (${formatNgay(from)} → ${formatNgay(to)})`;
+  if (isCurrent) label += ' — Tuần này';
+  else if (tuan === tuanHT + 1) label += ' — Tuần sau';
+
+  return `
+    <div class="card">
+      <h2><span class="title">${label}</span></h2>
+      ${renderTuanChiTiet(items, tuan, sub.hasTypes, soTiet)}
+    </div>
+  `;
+}
+
+function renderTuanChiTiet(items, tuan, hasTypes, soTiet) {
+  const coKT = soTiet.KT > 0;
+  const khongCoGi = (!items || items.length === 0) && !coKT;
+
+  if (khongCoGi) {
+    return `<div class="empty">Không có tiết nào trong tuần ${tuan}</div>`;
+  }
+
+  let html = '';
+
+  if (!hasTypes) {
+    if (items && items.length) {
+      html += items.map(t => `
+        <div class="lesson-card">
+          <div class="icon">📘</div>
+          <div class="info">
+            <div class="title">${escapeHtml(t.ma)}: ${escapeHtml(t.ten)}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+  } else {
+    const hd = (items || []).filter(t => t.loai === "HD");
+    const dc = (items || []).filter(t => t.loai === "DC");
+
+    if (hd.length) {
+      html += `<div class="type-group-title hd">🔵 Hoạt động (HĐ) — ${hd.length} tiết</div>`;
+      html += hd.map(t => `
+        <div class="lesson-card hd">
+          <div class="icon">🔵</div>
+          <div class="info">
+            <div class="title"><span class="ma hd">${escapeHtml(t.ma)}</span>: ${escapeHtml(t.ten)}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+    if (dc.length) {
+      html += `<div class="type-group-title dc">🟣 Sinh hoạt dưới cờ (DC) — ${dc.length} tiết</div>`;
+      html += dc.map(t => `
+        <div class="lesson-card dc">
+          <div class="icon">🟣</div>
+          <div class="info">
+            <div class="title"><span class="ma dc">${escapeHtml(t.ma)}</span>: ${escapeHtml(t.ten)}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+
+  if (coKT) {
+    html += `<div class="type-group-title kt">🎯 Kiểm tra định kì — ${soTiet.KT} tiết</div>`;
+    for (let i = 0; i < soTiet.KT; i++) {
+      html += `
+        <div class="lesson-card kt">
+          <div class="icon">🎯</div>
+          <div class="info">
+            <div class="title"><span class="ma kt">KT</span>: Kiểm tra định kì</div>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  return html || `<div class="empty">Không có tiết nào</div>`;
+}
+
+function attachEvents(sub) {
+  document.querySelectorAll('.class-tab').forEach(el => {
+    el.onclick = () => {
+      activeClassId = el.dataset.classId;
+      render();
+    };
+  });
+  renderWeekBody(sub);
+  renderPPCTBody(sub);
+}
+
+function renderWeekBody(sub) {
+  const tbody = document.getElementById('weekBody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  const tuanHT = getTuanHienTai(sub.config);
+  const { ketQua } = chiaTuan(sub);
+
+  for (let t = 1; t <= sub.config.totalWeeks; t++) {
+    const items = ketQua[t] || [];
+    const soTiet = getSoTietTuan(sub, t);
+    const edited = !isTuanMacDinh(sub, t);
+    const { from, to } = getNgayTuan(sub.config, t);
+
+    const tr = document.createElement('tr');
+    if (t === tuanHT) tr.classList.add('current-week');
+    if (t < tuanHT) tr.classList.add('past-week');
+    if (edited) tr.classList.add('edited');
+
+    let soTietCell = '';
+    if (sub.hasTypes) {
+      soTietCell = `
+        <div class="week-input">
+          <label>HĐ</label>
+          <input type="number" min="0" max="10" value="${soTiet.HD || 0}"
+                 onchange="suaSoTiet(${t}, 'HD', this.value)" class="num">
+          <span class="sep">·</span>
+          <label>DC</label>
+          <input type="number" min="0" max="10" value="${soTiet.DC || 0}"
+                 onchange="suaSoTiet(${t}, 'DC', this.value)" class="num">
+          <span class="sep">·</span>
+          <label>KT</label>
+          <input type="number" min="0" max="5" value="${soTiet.KT || 0}"
+                 onchange="suaSoTiet(${t}, 'KT', this.value)" class="num"
+                 style="background:${soTiet.KT > 0 ? '#fff5f5' : 'white'}; border-color:${soTiet.KT > 0 ? '#e53e3e' : '#cbd5e0'}">
+        </div>
+        ${edited ? `<button class="ghost small" onclick="resetTuan(${t})" style="margin-top:4px">↺ Reset</button>` : ''}
+      `;
+    } else {
+      soTietCell = `
+        <div class="week-input">
+          <label>Tiết</label>
+          <input type="number" min="0" max="10" value="${soTiet.P || 0}"
+                 onchange="suaSoTiet(${t}, 'P', this.value)" class="num">
+          <span class="sep">·</span>
+          <label>KT</label>
+          <input type="number" min="0" max="5" value="${soTiet.KT || 0}"
+                 onchange="suaSoTiet(${t}, 'KT', this.value)" class="num"
+                 style="background:${soTiet.KT > 0 ? '#fff5f5' : 'white'}; border-color:${soTiet.KT > 0 ? '#e53e3e' : '#cbd5e0'}">
+        </div>
+        ${edited ? `<button class="ghost small" onclick="resetTuan(${t})" style="margin-top:4px">↺ Reset</button>` : ''}
+      `;
+    }
+
+    let noiDung = '';
+    const tongTiet = items.length + (soTiet.KT || 0);
+    if (tongTiet === 0) {
+      noiDung = '<span style="color:#a0aec0">— nghỉ —</span>';
+    } else {
+      let parts = [];
+      items.forEach(x => {
+        const cls = x.loai === 'DC' ? 'ma dc' : (x.loai === 'HD' ? 'ma hd' : 'ma khac');
+        parts.push(`<div style="margin-bottom:3px"><span class="${cls}">${escapeHtml(x.ma)}</span>: ${escapeHtml(x.ten)}</div>`);
+      });
+      if (soTiet.KT > 0) {
+        parts.push(`<div style="margin-bottom:3px"><span class="ma kt">KT</span>: Kiểm tra định kì (${soTiet.KT} tiết)</div>`);
+      }
+      noiDung = parts.join('');
+    }
+
+    tr.innerHTML = `
+      <td><b>Tuần ${t}</b><br><span class="hint">${formatNgay(from)} → ${formatNgay(to)}</span></td>
+      <td>${soTietCell}</td>
+      <td>${noiDung}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+function renderPPCTBody(sub) {
+  const tbody = document.getElementById('ppctBody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  if (!sub.ppct.length) {
+    tbody.innerHTML = '<tr><td colspan="4" class="empty">Chưa có PPCT</td></tr>';
+    return;
+  }
+
+  const { ketQua } = chiaTuan(sub);
+  const tuanMap = {};
+  for (let t = 1; t <= sub.config.totalWeeks; t++) {
+    (ketQua[t] || []).forEach(item => {
+      tuanMap[item._idx] = t;
+    });
+  }
+
+  sub.ppct.forEach((t, i) => {
+    const loai = getLoaiHinh(t.ma);
+    const rowCls = loai === "DC" ? 'dc-row' : (loai === "HD" ? 'hd-row' : '');
+    const tr = document.createElement('tr');
+    tr.className = rowCls;
+    const tuan = tuanMap[i] || '—';
+    tr.innerHTML = `
+      <td>${i + 1}</td>
+      <td>${escapeHtml(t.ma)}</td>
+      <td>${escapeHtml(t.ten)}</td>
+      <td style="color:#718096; text-align:center">${tuan}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* =====================================================
+   HÀNH ĐỘNG
+===================================================== */
+function suaSoTiet(tuan, loai, val) {
+  const sub = getActiveSubject();
+  if (!sub) return;
+  const so = Math.max(0, Math.min(10, parseInt(val) || 0));
+
+  if (!sub.weekOverrides[tuan]) {
+    sub.weekOverrides[tuan] = { ...getSoTietTuan(sub, tuan) };
+  }
+  sub.weekOverrides[tuan][loai] = so;
+
+  saveData();
+  render();
+  toast(`Tuần ${tuan}: đã cập nhật`, 'success');
+}
+
+function resetTuan(tuan) {
+  const sub = getActiveSubject();
+  if (!sub) return;
+  delete sub.weekOverrides[tuan];
+  saveData();
+  render();
+  toast(`Tuần ${tuan}: đã reset`, 'success');
+}
+
+function resetAllWeekOverrides() {
+  const sub = getActiveSubject();
+  if (!sub) return;
+  if (!confirm(`Bỏ tất cả ghi đè của môn ${sub.name}?`)) return;
+  sub.weekOverrides = {};
+  saveData();
+  render();
+  toast('Đã reset tất cả', 'success');
+}
+
+function themLop() {
+  const sub = getActiveSubject();
+  if (!sub) return;
+  const name = prompt('Tên lớp mới (VD: 11A8):');
+  if (!name) return;
+  const ten = name.trim();
+  if (!ten) {
+    toast('Tên lớp không được để trống', 'error');
+    return;
+  }
+  const trung = sub.classes.find(c => c.name.toLowerCase() === ten.toLowerCase());
+  if (trung) {
+    toast('Đã có lớp tên "' + ten + '"', 'error');
+    return;
+  }
+  const id = 'lop-' + Date.now();
+  sub.classes.push({ id, name: ten });
+  saveData();
+  activeClassId = id;
+  render();
+  toast('Đã thêm lớp ' + ten, 'success');
+}
+
+function suaTenLop() {
+  const sub = getActiveSubject();
+  if (!sub) return;
+  const lop = getActiveClass();
+  if (!lop) return;
+
+  const tenMoi = prompt(`Sửa tên lớp "${lop.name}" thành:`, lop.name);
+  if (tenMoi === null) return;
+  const ten = tenMoi.trim();
+  if (!ten) {
+    toast('Tên lớp không được để trống', 'error');
+    return;
+  }
+
+  const trung = sub.classes.find(c => c.id !== lop.id && c.name.toLowerCase() === ten.toLowerCase());
+  if (trung) {
+    toast('Đã có lớp tên "' + ten + '"', 'error');
+    return;
+  }
+
+  lop.name = ten;
+  saveData();
+  render();
+  toast(`Đã đổi tên lớp thành "${ten}"`, 'success');
+}
+
+function xoaLop() {
+  const sub = getActiveSubject();
+  if (!sub) return;
+  const lop = getActiveClass();
+  if (!lop) return;
+
+  if (sub.classes.length <= 1) {
+    toast('Phải giữ ít nhất 1 lớp', 'error');
+    return;
+  }
+
+  if (!confirm(`Xóa lớp "${lop.name}"?\n\nLưu ý: các tuần ghi đè của lớp này sẽ mất.`)) return;
+
+  const tenXoa = lop.name;
+  sub.classes = sub.classes.filter(c => c.id !== lop.id);
+  activeClassId = sub.classes[0]?.id || null;
+  saveData();
+  render();
+  toast(`Đã xóa lớp "${tenXoa}"`, 'success');
+}
+
+/* =====================================================
+   MODAL
+===================================================== */
+function moCauHinh() {
+  const sub = getActiveSubject();
+  if (!sub) return;
+  const c = sub.config;
+
+  document.getElementById('cfgStartDate').value = c.startDate;
+  document.getElementById('cfgTotalWeeks').value = c.totalWeeks;
+
+  const typeDiv = document.getElementById('cfgTypeFields');
+  if (sub.hasTypes) {
+    typeDiv.innerHTML = `
+      <div class="field">
+        <label>Số HĐ mặc định/tuần</label>
+        <input type="number" id="cfgDefaultHD" min="0" max="10" value="${c.defaultHD}">
+      </div>
+      <div class="field">
+        <label>Số DC mặc định/tuần</label>
+        <input type="number" id="cfgDefaultDC" min="0" max="10" value="${c.defaultDC}">
+      </div>
+    `;
+  } else {
+    typeDiv.innerHTML = `
+      <div class="field">
+        <label>Số tiết mặc định/tuần</label>
+        <input type="number" id="cfgDefaultP" min="0" max="10" value="${c.defaultPeriods}">
+      </div>
+    `;
+  }
+
+  document.getElementById('modalConfig').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalConfig').classList.remove('open');
+}
+
+function saveConfig() {
+  const sub = getActiveSubject();
+  if (!sub) return;
+  const c = sub.config;
+
+  c.startDate = document.getElementById('cfgStartDate').value || c.startDate;
+  c.totalWeeks = Math.max(1, parseInt(document.getElementById('cfgTotalWeeks').value) || 35);
+
+  if (sub.hasTypes) {
+    c.defaultHD = Math.max(0, parseInt(document.getElementById('cfgDefaultHD').value) || 0);
+    c.defaultDC = Math.max(0, parseInt(document.getElementById('cfgDefaultDC').value) || 0);
+  } else {
+    c.defaultPeriods = Math.max(0, parseInt(document.getElementById('cfgDefaultP').value) || 1);
+  }
+
+  saveData();
+  closeModal();
+  render();
+  toast('Đã lưu cấu hình', 'success');
+}
+
+function resetAllConfig() {
+  const sub = getActiveSubject();
+  if (!sub) return;
+  if (!confirm(`Reset toàn bộ môn ${sub.name} về mặc định?`)) return;
+
+  const def = JSON.parse(JSON.stringify(DEFAULT_DATA.subjects.find(s => s.id === sub.id)));
+  if (def) {
+    sub.ppct = def.ppct;
+    sub.config = def.config;
+    sub.weekOverrides = def.weekOverrides;
+    sub.classes = def.classes;
+  }
+
+  saveData();
+  closeModal();
+  render();
+  toast('Đã reset', 'success');
+}
+
+/* =====================================================
+   UTILS
+===================================================== */
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+function toast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+document.getElementById('modalConfig').addEventListener('click', (e) => {
+  if (e.target.id === 'modalConfig') closeModal();
+});
+
+/* =====================================================
+   KHỞI ĐỘNG
+===================================================== */
+loadData();
+render();
+setInterval(render, 60000);
+</script>
+</body>
+</html>
