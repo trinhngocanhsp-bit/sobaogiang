@@ -408,6 +408,93 @@
   @media (max-width: 640px) {
     .table-wrap { max-height: none; overflow-y: visible; }
   }
+
+  /* ===== MOBILE: BẢNG TUẦN DẠNG CARD DỌC ===== */
+  @media (max-width: 640px) {
+    .week-table thead { display: none; }
+    
+    .week-table,
+    .week-table tbody,
+    .week-table tr,
+    .week-table td {
+      display: block;
+      width: 100%;
+    }
+    
+    .week-table { min-width: 0; }
+    
+    .week-table tr {
+      background: white;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid #cbd5e0;
+    }
+    
+    .week-table tr.current-week {
+      border-left-color: #d69e2e;
+      background: #fefcbf;
+    }
+    
+    .week-table tr.edited { border-left-color: #ed8936; }
+    .week-table tr.past-week { opacity: 0.65; }
+    
+    .week-table td:nth-child(1) {
+      padding: 0 0 8px 0;
+      border-bottom: 1px dashed #e2e8f0;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+    
+    .week-table td:nth-child(1) b {
+      font-size: 1.05rem;
+      color: #2c5282;
+    }
+    
+    .week-table tr.current-week td:nth-child(1) b { color: #975a16; }
+    .week-table tr.current-week td:nth-child(1) .hint { color: #975a16; }
+    
+    .week-table td:nth-child(2) {
+      padding: 6px 0;
+      margin-bottom: 6px;
+    }
+    
+    .week-table td:nth-child(2) .week-input {
+      gap: 6px;
+    }
+    
+    .week-table td:nth-child(2) .week-input label {
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    
+    .week-table td:nth-child(2) input.num {
+      width: 52px;
+      min-height: 38px;
+      font-size: 0.95rem;
+    }
+    
+    .week-table td:nth-child(3) {
+      padding: 8px 0 0 0;
+      border-top: 1px dashed #e2e8f0;
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+    
+    .week-table td:nth-child(3)::before {
+      content: "📖 Nội dung";
+      display: block;
+      font-size: 0.72rem;
+      color: #718096;
+      font-weight: 700;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    
+    .week-content::before { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -461,7 +548,7 @@
 /* =====================================================
    HẰNG SỐ
 ===================================================== */
-const STORAGE_KEY = 'sobaogiang_v10';
+const STORAGE_KEY = 'sobaogiang_v11';
 
 /* =====================================================
    PPCT TIN 11
